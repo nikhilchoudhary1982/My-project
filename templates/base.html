@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Complaint Management System{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+{% if session.user_id %}
+<nav class="navbar">
+    <div class="nav-brand">🗂 ComplaintMS</div>
+    <div class="nav-links">
+        {% set current_user = get_user_by_id(session.user_id) if session.user_id else None %}
+        {% if current_user and current_user.is_admin %}
+            <a href="{{ url_for('admin_dashboard') }}" class="nav-link">Admin Dashboard</a>
+        {% else %}
+            <a href="{{ url_for('dashboard') }}" class="nav-link">Dashboard</a>
+            <a href="{{ url_for('submit_complaint') }}" class="nav-link">Submit Complaint</a>
+            <a href="{{ url_for('complaint_status') }}" class="nav-link">My Complaints</a>
+        {% endif %}
+        <a href="{{ url_for('logout') }}" class="nav-link logout">Logout</a>
+    </div>
+</nav>
+{% endif %}
+
+<div class="container">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }}">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    {% block content %}{% endblock %}
+</div>
+
+<script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html>

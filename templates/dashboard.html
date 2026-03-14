@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>👋 Hello, {{ user.username }}!</h1>
+    <p>What would you like to do today?</p>
+</div>
+
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-number">{{ complaints | length }}</div>
+        <div class="stat-label">Total Complaints</div>
+    </div>
+    <div class="stat-card pending">
+        <div class="stat-number">{{ complaints | selectattr('status', 'equalto', 'Pending') | list | length }}</div>
+        <div class="stat-label">Pending</div>
+    </div>
+    <div class="stat-card in-progress">
+        <div class="stat-number">{{ complaints | selectattr('status', 'equalto', 'In Progress') | list | length }}</div>
+        <div class="stat-label">In Progress</div>
+    </div>
+    <div class="stat-card resolved">
+        <div class="stat-number">{{ complaints | selectattr('status', 'equalto', 'Resolved') | list | length }}</div>
+        <div class="stat-label">Resolved</div>
+    </div>
+</div>
+
+<div class="action-cards">
+    <a href="{{ url_for('submit_complaint') }}" class="action-card">
+        <div class="action-icon">📨</div>
+        <h3>Submit a Complaint</h3>
+        <p>Report an issue or concern quickly.</p>
+    </a>
+    <a href="{{ url_for('complaint_status') }}" class="action-card">
+        <div class="action-icon">🔍</div>
+        <h3>Track My Complaints</h3>
+        <p>View the status of all your submissions.</p>
+    </a>
+</div>
+
+{% if complaints %}
+<div class="section">
+    <h2>Recent Complaints</h2>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>#ID</th>
+                <th>Title</th>
+                <th>Status</th>
+                <th>Submitted</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for c in complaints[-5:][::-1] %}
+            <tr>
+                <td>#{{ c.id }}</td>
+                <td>{{ c.title }}</td>
+                <td><span class="badge badge-{{ c.status | lower | replace(' ', '-') }}">{{ c.status }}</span></td>
+                <td>{{ c.created_at }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endif %}
+{% endblock %}

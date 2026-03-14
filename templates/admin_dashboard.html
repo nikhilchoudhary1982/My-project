@@ -1,0 +1,80 @@
+{% extends 'base.html' %}
+{% block title %}Admin Dashboard{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>⚙️ Admin Dashboard</h1>
+    <p>Manage all submitted complaints.</p>
+</div>
+
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-number">{{ stats.total }}</div>
+        <div class="stat-label">Total</div>
+    </div>
+    <div class="stat-card pending">
+        <div class="stat-number">{{ stats.pending }}</div>
+        <div class="stat-label">Pending</div>
+    </div>
+    <div class="stat-card in-progress">
+        <div class="stat-number">{{ stats.in_progress }}</div>
+        <div class="stat-label">In Progress</div>
+    </div>
+    <div class="stat-card resolved">
+        <div class="stat-number">{{ stats.resolved }}</div>
+        <div class="stat-label">Resolved</div>
+    </div>
+</div>
+
+{% if complaints %}
+<div class="section">
+    <h2>All Complaints</h2>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>#ID</th>
+                <th>User</th>
+                <th>Title</th>
+                <th>Description</th>
+                <th>Status</th>
+                <th>Submitted</th>
+                <th>Update Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for c in complaints | reverse %}
+            <tr>
+                <td><strong>#{{ c.id }}</strong></td>
+                <td>
+                    <span class="user-info">
+                        {{ c.username }}<br>
+                        <small>{{ c.user_email }}</small>
+                    </span>
+                </td>
+                <td>{{ c.title }}</td>
+                <td class="desc-cell">{{ c.description }}</td>
+                <td><span class="badge badge-{{ c.status | lower | replace(' ', '-') }}">{{ c.status }}</span></td>
+                <td>{{ c.created_at }}</td>
+                <td>
+                    <form method="POST" action="{{ url_for('update_complaint', complaint_id=c.id) }}" class="status-form">
+                        <select name="status" class="select-status">
+                            <option value="Pending" {% if c.status == 'Pending' %}selected{% endif %}>Pending</option>
+                            <option value="In Progress" {% if c.status == 'In Progress' %}selected{% endif %}>In Progress</option>
+                            <option value="Resolved" {% if c.status == 'Resolved' %}selected{% endif %}>Resolved</option>
+                        </select>
+                        <button type="submit" class="btn btn-sm btn-primary">Update</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% else %}
+<div class="empty-state">
+    <div class="empty-icon">📭</div>
+    <h3>No complaints submitted yet</h3>
+    <p>When users submit complaints, they will appear here.</p>
+</div>
+{% endif %}
+{% endblock %}
